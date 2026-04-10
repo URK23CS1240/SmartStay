@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smartstay
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: smartstay
+  template:
+    metadata:
+      labels:
+        app: smartstay
+    spec:
+      containers:
+      - name: smartstay
+        image: YOUR_DOCKERHUB_USERNAME/smartstay:latest
+        ports:
+        - containerPort: 5000

@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone') {
+            steps {
+                git 'YOUR_GITHUB_REPO_LINK'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t smartstay .'
+            }
+        }
+
+        stage('Tag Image') {
+            steps {
+                sh 'docker tag smartstay YOUR_DOCKERHUB_USERNAME/smartstay:latest'
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                sh 'docker push YOUR_DOCKERHUB_USERNAME/smartstay:latest'
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh 'kubectl apply -f k8s/'
+            }
+        }
+    }
+}

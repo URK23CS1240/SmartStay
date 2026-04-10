@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SmartStay</title>
+</head>
+<body>
+    <h1>Hotel Room Booking</h1>
+    <ul>
+        {% for room, status in rooms.items() %}
+        <li>
+            Room {{room}} - {{status}}
+            {% if status == "Available" %}
+            <form method="POST" action="/book">
+                <input type="hidden" name="room" value="{{room}}">
+                <button type="submit">Book</button>
+            </form>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
