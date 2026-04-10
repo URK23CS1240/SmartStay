@@ -1,22 +1,175 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>SmartStay</title>
+<meta charset="UTF-8">
+<title>SmartStay Dashboard</title>
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #0f172a;
+    color: white;
+}
+
+header {
+    background: #1e293b;
+    padding: 15px;
+    text-align: center;
+    font-size: 22px;
+}
+
+.container {
+    display: flex;
+}
+
+.sidebar {
+    width: 220px;
+    background: #020617;
+    padding: 20px;
+    height: 100vh;
+}
+
+.sidebar button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background: #1e40af;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+.card {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.room {
+    padding: 10px;
+    border-radius: 8px;
+    background: #334155;
+}
+
+.available { background: #16a34a; }
+.booked { background: #dc2626; }
+
+button.book {
+    margin-top: 10px;
+    padding: 5px;
+    border: none;
+    background: black;
+    color: white;
+    cursor: pointer;
+}
+</style>
 </head>
+
 <body>
-    <h1>Hotel Room Booking</h1>
-    <ul>
-        {% for room, status in rooms.items() %}
-        <li>
-            Room {{room}} - {{status}}
-            {% if status == "Available" %}
-            <form method="POST" action="/book">
-                <input type="hidden" name="room" value="{{room}}">
-                <button type="submit">Book</button>
-            </form>
-            {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
+
+<header>🏨 SmartStay Dashboard</header>
+
+<div class="container">
+
+<div class="sidebar">
+    <button onclick="showRooms()">Rooms</button>
+    <button onclick="showStats()">Analytics</button>
+    <button onclick="resetData()">Reset</button>
+</div>
+
+<div class="main" id="mainContent"></div>
+
+</div>
+
+<script>
+
+// SAMPLE DATABASE (localStorage)
+let rooms = JSON.parse(localStorage.getItem("rooms")) || [
+    {id: 101, status: "Available"},
+    {id: 102, status: "Booked"},
+    {id: 103, status: "Available"},
+    {id: 104, status: "Available"},
+    {id: 105, status: "Booked"},
+    {id: 106, status: "Available"}
+];
+
+function saveData() {
+    localStorage.setItem("rooms", JSON.stringify(rooms));
+}
+
+// SHOW ROOMS
+function showRooms() {
+    let html = `<div class="card"><h2>Room Management</h2>
+    <div class="grid">`;
+
+    rooms.forEach((room, index) => {
+        html += `
+        <div class="room ${room.status.toLowerCase()}">
+            <h3>Room ${room.id}</h3>
+            <p>Status: ${room.status}</p>
+            ${room.status === "Available" ? 
+            `<button class="book" onclick="bookRoom(${index})">Book</button>` : 
+            `<button class="book" onclick="checkout(${index})">Checkout</button>`}
+        </div>`;
+    });
+
+    html += `</div></div>`;
+    document.getElementById("mainContent").innerHTML = html;
+}
+
+// BOOK ROOM
+function bookRoom(index) {
+    rooms[index].status = "Booked";
+    saveData();
+    showRooms();
+}
+
+// CHECKOUT
+function checkout(index) {
+    rooms[index].status = "Available";
+    saveData();
+    showRooms();
+}
+
+// ANALYTICS
+function showStats() {
+    let total = rooms.length;
+    let booked = rooms.filter(r => r.status === "Booked").length;
+    let available = total - booked;
+
+    let html = `
+    <div class="card">
+        <h2>📊 Analytics</h2>
+        <p>Total Rooms: ${total}</p>
+        <p>Booked: ${booked}</p>
+        <p>Available: ${available}</p>
+    </div>`;
+
+    document.getElementById("mainContent").innerHTML = html;
+}
+
+// RESET
+function resetData() {
+    localStorage.clear();
+    location.reload();
+}
+
+// INITIAL LOAD
+showRooms();
+
+</script>
+
 </body>
 </html>
